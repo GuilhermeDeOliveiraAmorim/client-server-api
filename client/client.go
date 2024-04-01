@@ -44,7 +44,7 @@ func main() {
 		return
 	}
 
-	valor, ok := cotacao["bid"].(string)
+	valor, ok := cotacao["valor"].(string)
 	if !ok {
 		fmt.Println("Valor da cotação não encontrado.")
 		return

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -36,11 +37,11 @@ func main() {
 }
 
 func cotacaoHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 200*time.Millisecond)
+	ctx, cancel := context.WithTimeout(r.Context(), 500*time.Millisecond)
 	defer cancel()
 
 	client := http.Client{
-		Timeout: 200 * time.Millisecond,
+		Timeout: 500 * time.Millisecond,
 	}
 
 	req, err := http.NewRequestWithContext(ctx, "GET", "https://economia.awesomeapi.com.br/json/last/USD-BRL", nil)
@@ -65,6 +66,8 @@ func cotacaoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Resposta da API:", string(body))
+
 	var cotacao map[string]interface{}
 	err = json.Unmarshal(body, &cotacao)
 	if err != nil {
@@ -73,7 +76,7 @@ func cotacaoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	valor, ok := cotacao["bid"].(string)
+	valor, ok := cotacao["USDBRL"].(map[string]interface{})["bid"].(string)
 	if !ok {
 		log.Println("Valor da cotação não encontrado.")
 		http.Error(w, "Erro interno", http.StatusInternalServerError)
