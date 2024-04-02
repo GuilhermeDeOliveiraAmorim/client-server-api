@@ -83,7 +83,10 @@ func cotacaoHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.Exec("INSERT INTO cotacoes (valor) VALUES (?)", valor)
+	ctxDB, cancelDB := context.WithTimeout(context.Background(), 10*time.Millisecond)
+	defer cancelDB()
+
+	_, err = db.ExecContext(ctxDB, "INSERT INTO cotacoes (valor) VALUES (?)", valor)
 	if err != nil {
 		log.Println("Erro ao inserir no banco:", err)
 		http.Error(w, "Erro interno", http.StatusInternalServerError)
